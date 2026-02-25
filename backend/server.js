@@ -1,6 +1,6 @@
 /**
  * Risk Analysis Tech Pack - Backend
- * Main server entry point. Port: 8000
+ * Main server entry point. Port: 5000
  */
 import express from 'express';
 import cors from 'cors';
@@ -11,11 +11,12 @@ import { fileURLToPath } from 'url';
 import uploadRoutes from './routes/uploadRoutes.js';
 import analysisRoutes from './routes/analysisRoutes.js';
 import techpackRoutes from './routes/techpack.js';
+import adminRoutes from './routes/adminRoutes.js';
 import { supabase } from './db.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
-const PORT = 8000;
+const PORT = 5000;
 
 app.use(cors());
 app.use(express.json());
@@ -59,9 +60,10 @@ app.get('/insert-test-style', async (req, res) => {
   res.json({ inserted: data });
 });
 
-app.use('/', analysisRoutes);
-app.use('/upload', uploadRoutes);
+app.use('/api/analysis', analysisRoutes);
+app.use('/api/upload', uploadRoutes);
 app.use('/api/techpack', techpackRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.use((err, req, res, next) => {
   console.error('[ERROR]', err.stack);

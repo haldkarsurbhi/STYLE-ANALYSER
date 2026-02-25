@@ -7,20 +7,16 @@ import { existsSync } from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Load backend/.env explicitly (fallback to backend/backend/.env when present)
-const envPath = join(__dirname, '.env');
-const envPathNested = join(__dirname, 'backend', '.env');
-if (existsSync(envPath)) {
-  dotenv.config({ path: envPath });
-} else if (existsSync(envPathNested)) {
-  dotenv.config({ path: envPathNested });
-}
+const envPath = existsSync(join(__dirname, '.env')) ? join(__dirname, '.env') : join(__dirname, 'backend', '.env');
+dotenv.config({ path: envPath });
 
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (process.env.NODE_ENV !== 'test') {
-  console.log('[db] SUPABASE_URL loaded:', supabaseUrl ? `${supabaseUrl.slice(0, 36)}...` : '(missing)');
+console.log('[db] SUPABASE_SERVICE_ROLE_KEY present:', !!supabaseKey);
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
 }
 
-export const supabase = createClient(supabaseUrl || '', supabaseKey || '');
+export const supabase = createClient(supabaseUrl, supabaseKey);
